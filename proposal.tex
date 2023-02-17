@@ -1,4 +1,4 @@
-\documentclass[aps,prl,twocolumn,nolongbibliography,12pt]{revtex4-2}
+\documentclass[prl,aps,superscriptaddress,twocolumn,11pt,nolongbibliography]{revtex4-2}
 \usepackage[pdftex]{graphicx}
 \usepackage{color}
 \usepackage{amsmath,amsthm,amssymb,mathtools}
@@ -48,18 +48,31 @@
 
 \maketitle
 
+% Briefly introduce your task in the selected challenge. What is the input and what is the output?
+% Getting to know your data. How large is it? What is the type of your data (categorical, numerical, etc)? 
+% Are there any network, text or image data included?
 
 \section{Introduction}
+\begin{figure*}
+\includegraphics[width=5in]{figs/activity.png}
+\caption{\label{fig:activity}
+Microbusiness activity index by county in December 2021.
+}
+\end{figure*}
+
 Policymakers in the United States attempt to create economies that are robust to industry downturns. 
 The success (or limitation) of new policies heavily relies on the data of business entities. 
-Gaining accurate visibility into enabling economic directions, however, is a challenging task because a large number of `microbusinesses'', defined as businesses with ten or fewer employees, are often too small or too new to be included in standard data sources.
+Gaining accurate visibility into enabling economic decisions, however, is a challenging task because a large number of `microbusinesses'', defined as businesses with ten or fewer employees, are often too small or too new to be included in standard data sources.
 To overcome this challenge, the Venture Forward team at GoDaddy has studied tens of millions of microbusinesses in the United States for several years and has made the survey data publicly available. 
 Thus, using data science techniques will enable policy leaders to gain more insights, which will be helpful for microbusiness entrepreneurs. 
 This competition serves as a platform for participants to broaden the economic impact. 
 
-% Briefly introduce your task in the selected challenge. What is the input and what is the output?
-% Getting to know your data. How large is it? What is the type of your data (categorical, numerical, etc)? 
-% Are there any network, text or image data included?
+The task for this competition is to forecast microbusiness activity (Fig.~\ref{fig:activity}) across the United States, as measured by the density of microbusinesses for each of the 3142 counties. 
+The values for this column are provided on a monthly basis, starting from August 1, 2019 to October 1, 2022. 
+The participants are predicting the microbusiness density for the next month. 
+Thus, the total number of given records is $3142 \times 39 = 122538$ rows of data.
+The other columns that are provided include the percentage of households in the county with access to broadband of any type, the percent of the population in the county over age 25 with a 4-year college degree, the percent of the population in the county born outside of the United States, the percent of the workforce in the county employed in information related industries, and the median household income in the county. 
+These extra columns serve as features in training models.
 
 \section{Method}
 % How do you plan to solve it? Explain your idea at a high-level. (You may revise it or even propose a completely new one later. We just need to know that you have already spent some time thinking about it.)
