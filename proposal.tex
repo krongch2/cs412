@@ -61,10 +61,10 @@ Microbusiness activity index by county in December 2021.
 
 Policymakers in the United States attempt to create economies that are robust to industry downturns. 
 The success (or limitation) of new policies heavily relies on the data of business entities. 
-Gaining accurate visibility into enabling economic decisions, however, is a challenging task because a large number of `microbusinesses'', defined as businesses with ten or fewer employees, are often too small or too new to be included in standard data sources.
+Gaining accurate visibility into enabling economic decisions, however, is a challenging task because a large number of ``microbusinesses'', defined as businesses with ten or fewer employees, are often too small or too new to be included in standard data sources.
 To overcome this challenge, the Venture Forward team at GoDaddy has studied tens of millions of microbusinesses in the United States for several years and has made the survey data publicly available. 
 Thus, using data science techniques will enable policy leaders to gain more insights, which will be helpful for microbusiness entrepreneurs. 
-This competition serves as a platform for participants to broaden the economic impact. 
+This competition serves as a platform for participants to broaden the vision on the economic impact. 
 
 \section{Data interpretation}
 The task for this competition is to forecast microbusiness activity (Fig.~\ref{fig:activity}) across the United States, as measured by the density of microbusinesses for each of the 3142 counties~\cite{yu2021godaddy}.
@@ -86,12 +86,13 @@ This type of model depends on the values of variables in the past, which is give
 y_t - \alpha_1 y_{t-1} &\cdots - \alpha_p y_{t-p} \nonumber \\
 &= \epsilon_t + \theta_1 \epsilon_{t-1} + \cdots + \theta_q \epsilon_{t-q},
 \end{align}
-where p and q denote the order of time lags of the data (called the autoregressive model) and errors (the moving-average model). 
+where $p$ and $q$ denote the order of time lags of the data (called the autoregressive model) and errors (the moving-average model). 
 This model can be generalized to include the multiplicity of the roots as given by 
 \begin{align}
 (1 - \sum_i^p \alpha_i L^i) (1 - L)^d y_t = (1 + \sum_i^q \theta_i L^i) \epsilon_t,
 \end{align}
-where L is the lag operator, which moves the data by one unit of time, and d is the multiplicity. We solve this model by looping through different combinations of (p, d, q) to find the model that yields the lowest AIC value. 
+where $L$ is the lag operator, which moves the data by one unit of time, and $d$ is the multiplicity. 
+We solve this model by looping through different combinations of $(p, d, q)$ to find the model that yields the lowest Akaike information criterion (AIC) value. 
 In our analysis, the model called seasonal-ARIMAX (SARIMAX) is used, which is an extension to the ARIMA model to capture seasonal data with exogenous variables.
 
 Another class of techniques to be explored is tree-based models, such as random forest and XGBoost~\cite{chen2016xgboost}.
@@ -106,10 +107,10 @@ For the evaluation of our answers, we will use symmetric mean absolute percentag
 Our analysis involves two milestones. 
 First, the training of time-series data without exogenous variables should be completed, which will be our baseline for a simple solution. 
 Next, the density data will be trained with the seasonal information and exogenous variables included. 
-We expect to arrive at this stage by March 1, 2023.
+We expect to arrive at this stage by March 15, 2023.
 
 After the auto-regressive models are well explored, we will move on to the tree-based models. 
-We expect to complete the training models using random forest and XGBoost by April 1, 2023. 
+We expect to complete the training models using random forest and XGBoost by April 15, 2023. 
 
 % Argue on the feasibility to finish the task on the selected challenge. 
 % If your framework is too complicated, you might struggle to implement it. 
