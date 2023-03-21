@@ -39,7 +39,7 @@
 \newcommand{\mick}[1]{\textbf{\textcolor[rgb]{0,0.6,0.3}{#1}}}
 
 \begin{document}
-\title{CS 412: Project Proposal for Microbusiness Density Forecasting}
+\title{CS 412: Mid-point Report for Microbusiness Density Forecasting}
 \author{Kittithat Krongchon (krongch2)}
 \affiliation{Department of Physics, University of Illinois at Urbana-Champaign}
 \author{Ting Cheng (tingc4)}
@@ -70,7 +70,7 @@ This competition serves as a platform for participants to broaden the vision on 
 The task for this competition is to forecast microbusiness activity (Fig.~\ref{fig:activity}) across the United States, as measured by the density of microbusinesses for each of the 3142 counties~\cite{yu2021godaddy}.
 The values for this column are provided on a monthly basis, starting from August 1, 2019 to October 1, 2022. 
 The participants are predicting the microbusiness density for the next month. 
-Thus, the total number of given records is $3142 \times 39 = 122538$ rows of data.
+Thus, the total number of given records is $3142 \times 41 = 128822$ rows of data.
 The other columns that are provided include the percentage of households in the county with access to broadband of any type, the percent of the population in the county over age 25 with a 4-year college degree, the percent of the population in the county born outside of the United States, the percent of the workforce in the county employed in information related industries, and the median household income in the county. 
 These extra columns serve as features in training models.
 The total size of these datasets is 10.93MB and all of them are numerical data without unstructured data. 
@@ -80,6 +80,30 @@ In this proposal, we will explore several training approaches, most of which can
 % How do you plan to solve it? Explain your idea at a high-level. (You may revise it or even propose a completely new one later. We just need to know that you have already spent some time thinking about it.)
 % List at least 2 baseline approaches you would like to compare with. Add citations if they are from research papers.
 \section{Method}
+
+\subsection{Linear regression}
+Even though time-series forecasting is a challenging problem and requires procedures, whose performance relies on intensive feature engineering and complex models, in the first step of this report, a simple linear regression is used to obtain a baseline of our prediction. 
+Despite being one of the most common techniques to understand linear relationships between dependent variables and independent variables, the formalism for simple linear regression is included for completion. 
+The model is given by 
+\begin{align}
+y_i = \beta_0 + \beta_1 x_i1 + \beta_2 x_i2 + \cdots + \beta_p x_ip + \epsilon_i, 
+\end{align}
+where $y$ represents the dependent variable, and $x_p$'s represent independent variables. 
+The index i denotes the sample, and p labels the feature variables. The goal of linear regression is to find a set of $\beta$'s that can minimize the cost function given by 
+\begin{align}
+\frac{1}{n} \sum_i (y_{i} - \hat{y}_{i})^2.
+\end{align}
+
+This technique, however, is based on a few assumptions that affect the accuracy of the linear model. 
+First, linearity is assumed because the model equation only depends on the first polynomial order of independent variables. 
+For a higher order relationship, polynomial regression might be required although such a technique could result in overfitting. 
+Another assumption is that the errors, $\epsilon_i$, are assumed to be independent and normal. 
+The reason is given by the central limit theorem, which says the sum of a large number of independent and identically distributed random variables approaches a normal distribution. 
+Since the errors represent the combined influence of one or more independent variables that are not included in the linear model, we want them to satisfy the condition for the central limit theorem. 
+
+In our implementation, one model is used for one county. 
+
+\subsection{Auto-regressive models}
 For a time-series data, the auto-regressive integrated moving average (ARIMA) model is a widely used model that is based on constructing a model that depends on values at a different time. 
 This type of model depends on the values of variables in the past, which is given by 
 \begin{align}
@@ -95,15 +119,18 @@ where $L$ is the lag operator, which moves the data by one unit of time, and $d$
 We solve this model by looping through different combinations of $(p, d, q)$ to find the model that yields the lowest Akaike information criterion (AIC) value. 
 In our analysis, the model called seasonal-ARIMAX (SARIMAX) is used, which is an extension to the ARIMA model to capture seasonal data with exogenous variables.
 
+\subsection{Tree-based models}
 Another class of techniques to be explored is tree-based models, such as random forest and XGBoost~\cite{chen2016xgboost}.
 Random forest is a prediction algorithm, which is an extension of a decision tree. 
 The algorithm works as follows. First, we perform a random selection with replacement on the data, i.e. bootstrapping. 
 Then, we generate a decision tree on a randomly selected subset of feature variables. 
 Once all the decision trees (hence forest) are obtained, we use them to predict the dependent variable from a given sample set of feature variables.
+
 For the evaluation of our answers, we will use symmetric mean absolute percentage error (SMAPE), as given by
 \begin{align}
-\textrm{SMAPE} &= 100 \cdot \frac{2}{n} \sum_{i}^n \frac{|y_i - \hat{y}_i|}{|y_i| + |\hat{y}_i|}
+\textrm{SMAPE} &= 100 \cdot \frac{2}{n} \sum_{i}^n \frac{|y_i - \hat{y}_i|}{|y_i| + |\hat{y}_i|},
 \end{align}
+where $i$ represents the month number, with the 0-th month corresponding to August 2019, $y_i$ and $\hat{y}_i$ denote the true and predicted values of microbusiness density.
 
 % A timeline that specifies your plan to finish the course project.
 \section{Timeline}
@@ -124,26 +151,7 @@ The challenge for us, therefore, comes down to turning the provided information 
 
 
 \section{Result}
-Even though time-series forecasting is a challenging problem and requires prodecures, whose preformance rely on feature engineering and complex models, in this report, a simple linear regression is used to obtain a baseline of our prediction. 
-Despite being one of the most common techniques to understand linear relationships between dependent variables and independent variables, the formalism for simple linear regression is included for completion. 
-The model is given by 
-\begin{align}
-y_i = \beta_0 + \beta_1 x_i1 + \beta_2 x_i2 + \cdots + \beta_p x_ip + \epsilon_i, 
-\end{align}
-where $y$ represents the dependent variable, and $x_p$'s represent independent variables. 
-The index i denotes the sample, and p labels the feature variables. The goal of linear regression is to find a set of $\beta$'s that can minimize the cost function given by 
-\begin{align}
-\frac{1}{n} \sum_i (y_{i} - \hat{y}_{i})^2.
-\end{align}
-
-This technique, however, is based on a few assumptions that affect the accuracy of the linear model. 
-First, linearity is assumed because the model equation only depends on the first polynomial order of independent variables. 
-For a higher order relationship, polynomial regression might be required although such a technique could result in overfitting. 
-Another assumption is that the errors, $\epsilon_i$, are assumed to be independent and normal. 
-The reason is given by the central limit theorem, which says the sum of a large number of independent and identically distributed random variables approaches a normal distribution. 
-Since the errors represent the combined influence of one or more independent variables that are not included in the linear model, we want them to satisfy the condition for the central limit theorem. 
-
-The result 
+The simply linear regression 
 \begin{figure*}
 \includegraphics[width=7in]{figs/linear.pdf}
 \caption{\label{fig:}
