@@ -100,7 +100,10 @@ Random forest is a prediction algorithm, which is an extension of a decision tre
 The algorithm works as follows. First, we perform a random selection with replacement on the data, i.e. bootstrapping. 
 Then, we generate a decision tree on a randomly selected subset of feature variables. 
 Once all the decision trees (hence forest) are obtained, we use them to predict the dependent variable from a given sample set of feature variables.
-For the evaluation of our answers, we will use symmetric mean absolute percentage error (SMAPE) and root-mean-square error (RMSE).
+For the evaluation of our answers, we will use symmetric mean absolute percentage error (SMAPE), as given by
+\begin{align}
+\textrm{SMAPE} &= 100 \cdot \frac{2}{n} \sum_{i}^n \frac{|y_i - \hat{y}_i|}{|y_i| + |\hat{y}_i|}
+\end{align}
 
 % A timeline that specifies your plan to finish the course project.
 \section{Timeline}
@@ -119,5 +122,43 @@ We expect to complete the training models using random forest and XGBoost by Apr
 Since the time-series prediction involved in this competition has been well explored in literature, and the existing tools are robust, this specific challenge has a straightforward workflow. 
 The challenge for us, therefore, comes down to turning the provided information into an object that is suitable for each specific tool as discussed in the previous section.
 
-\bibliography{proposal}{}
+
+\section{Result}
+Even though time-series forecasting is a challenging problem and requires prodecures, whose preformance rely on feature engineering and complex models, in this report, a simple linear regression is used to obtain a baseline of our prediction. 
+Despite being one of the most common techniques to understand linear relationships between dependent variables and independent variables, the formalism for simple linear regression is included for completion. 
+The model is given by 
+\begin{align}
+y_i = \beta_0 + \beta_1 x_i1 + \beta_2 x_i2 + \cdots + \beta_p x_ip + \epsilon_i, 
+\end{align}
+where $y$ represents the dependent variable, and $x_p$'s represent independent variables. 
+The index i denotes the sample, and p labels the feature variables. The goal of linear regression is to find a set of $\beta$'s that can minimize the cost function given by 
+\begin{align}
+\frac{1}{n} \sum_i (y_{i} - \hat{y}_{i})^2.
+\end{align}
+
+This technique, however, is based on a few assumptions that affect the accuracy of the linear model. 
+First, linearity is assumed because the model equation only depends on the first polynomial order of independent variables. 
+For a higher order relationship, polynomial regression might be required although such a technique could result in overfitting. 
+Another assumption is that the errors, $\epsilon_i$, are assumed to be independent and normal. 
+The reason is given by the central limit theorem, which says the sum of a large number of independent and identically distributed random variables approaches a normal distribution. 
+Since the errors represent the combined influence of one or more independent variables that are not included in the linear model, we want them to satisfy the condition for the central limit theorem. 
+
+The result 
+\begin{figure*}
+\includegraphics[width=7in]{figs/linear.pdf}
+\caption{\label{fig:}
+Linear regression: SMAPE = 8.355
+}
+\end{figure*}
+
+
+\begin{figure*}
+\includegraphics[width=7in]{figs/arima.pdf}
+\caption{\label{fig:arima}
+ARIMA: SMAPE = 4.609
+}
+\end{figure*}
+
+
+\bibliography{paper}{}
 \end{document}

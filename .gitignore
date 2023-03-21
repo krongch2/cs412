@@ -5,6 +5,7 @@
 *.out
 *.synctex.gz
 *Notes.bib
+*paper.pdf
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
