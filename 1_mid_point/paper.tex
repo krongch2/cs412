@@ -101,8 +101,6 @@ Another assumption is that the errors, $\epsilon_i$, are assumed to be independe
 The reason is given by the central limit theorem, which says the sum of a large number of independent and identically distributed random variables approaches a normal distribution. 
 Since the errors represent the combined influence of one or more independent variables that are not included in the linear model, we want them to satisfy the condition for the central limit theorem. 
 
-In our implementation, one model is used for one county. 
-
 \subsection{Auto-regressive models}
 For a time-series data, the auto-regressive integrated moving average (ARIMA) model is a widely used model that is based on constructing a model that depends on values at a different time. 
 This type of model depends on the values of variables in the past, which is given by 
@@ -145,16 +143,27 @@ We expect to complete the training models using random forest and XGBoost by Apr
 % Argue on the feasibility to finish the task on the selected challenge. 
 % If your framework is too complicated, you might struggle to implement it. 
 % Feel free to use existing tools and packages (e.g., repositories on GitHub).
+
+\section{Geographic Features}
+As the prediction is based on the different counties in the United State, We brought up ideas to add geographic features like longitude and latitude. Under Assumption, the counties with adjacent latitudes have similar temperatures and weather. The geographic feathers would bring up hidden layers of features in our tree-based models like XGBoost or Random Forest. We would use Nominatim geocoder in geopy module to find the correlated longitude and latitude for each county in the data set.
+\begin{figure}
+\includegraphics[width=3in]{figs/contractor-licensing-requirements-by-state.jpg}
+\caption{\label{fig:activity}
+US Maps with Longitude and Latitude.
+}
+\end{figure}
+
 \section{Feasibility}
 Since the time-series prediction involved in this competition has been well explored in literature, and the existing tools are robust, this specific challenge has a straightforward workflow. 
 The challenge for us, therefore, comes down to turning the provided information into an object that is suitable for each specific tool as discussed in the previous section.
 
-
 \section{Result}
-The simply linear regression 
+Our implementation for the linear regression model is such that one model is used per one county, which means that there are a total of 3142 models. 
+The results for some of the counties are displayed in Fig.~\ref{fig:linear}.
+
 \begin{figure*}
 \includegraphics[width=7in]{figs/linear.pdf}
-\caption{\label{fig:}
+\caption{\label{fig:linear}
 Linear regression: SMAPE = 8.355
 }
 \end{figure*}
