@@ -1,46 +1,30 @@
-import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 
-import features
+import feature_engineering
 import models
+import metric
 
-import warnings
-from statsmodels.tools.sm_exceptions import ConvergenceWarning
-warnings.simplefilter('ignore', ConvergenceWarning)
+def iterative_train(d, features, month_first=35, month_last=40):
+    for train_cutoff in range(month_first, month_last+1):
+        print(train_cutoff)
+        model = models.get_model()
+        train_idxs = (0 <= d.month_number) & (d.month_number < train_cutoff)
+        valid_idxs = (d.month_number == train_cutoff)
+        model.fit(d.loc[train_idxs, features], d.loc[train_idxs, 'y'])
+
+        d.loc[valid_idxs, 'yhat'] = model.predict(d.loc[valid_idxs, features])
+        d.loc[valid_idxs, 'y'] = d.loc[valid_idxs, 'y'].fillna(d.loc[valid_idxs, 'yhat'])
+        d, _ = feature_engineering.add_lag(d, target='y')
+        d, _ = feature_engineering.add_rolling(d, target='y')
 
 
-data, d, test = features.get_train_test()
-model = models.get_model()
+    test_idxs = (month_first <= d.month_number) & (d.month_number <= month_last)
+    print('SMAPE:', metric.get_smape(d.loc[test_idxs, 'ytrue'], d.loc[test_idxs, 'yhat']))
+    return d, model
 
-# p = d.groupby('cfips', group_keys=True).apply(models.predict_arima).reset_index(0, drop=True)
-
-def plot(d, nfigs=18, ncols=6):
-    nrows = int(np.ceil(nfigs/ncols))
-    fig, axs = plt.subplots(nrows=nrows, ncols=ncols, figsize=(ncols*3, nrows*3), sharey=False, sharex=True)
-
-    for i, cfips in enumerate(d.cfips.unique()):
-        if i >= nfigs:
-            break
-        idx_row = int(i / ncols)
-        idx_col = i % ncols
-        if nrows == 1:
-            ax = axs[idx_col]
-        else:
-            ax = axs[idx_row, idx_col]
-
-        g = d.loc[d.cfips == cfips, :].reset_index(0, drop=True)
-        ax.plot(g['month_number'], g['y'], 'o-', label='raw')
-        ax.plot(g['month_number'], g['yhat'], 'o-', label='predicted')
-        cfips = g.cfips.unique()[0]
-        ax.set_title(f'cfips={cfips}')
-        ax.set_xlabel('month_number')
-        if idx_row == 0 and idx_col == ncols-1:
-            ax.legend(fancybox=False)
-        if idx_col == 0:
-            ax.set_ylabel('y')
-
-    fig.tight_layout()
-    plt.show()
-
-plot(p)
+d, test, features = feature_engineering.get_train_test()
+d, features_temp = feature_engineering.add_all_features(d)
+features += features_temp
+d, model = iterative_train(d, features)
+d.to_csv('trained.csv', index=False)
