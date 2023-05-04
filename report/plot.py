@@ -2,8 +2,14 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 
-def plot(d, nrows=10, ncols=10):
-    fig, axs = plt.subplots(nrows=nrows, ncols=ncols, figsize=(ncols*3, nrows*3), sharey=True, sharex=True)
+import metric
+
+pd.set_option('display.max_rows', 500)
+pd.set_option('display.max_columns', 500)
+pd.set_option('display.width', 1000)
+
+def plot(d, nrows=8, ncols=9):
+    fig, axs = plt.subplots(nrows=nrows, ncols=ncols, figsize=(ncols*3, nrows*3), sharex=True)
     for i, cfips in enumerate(d.cfips.unique()):
         if i >= nrows*ncols:
             break
@@ -31,6 +37,15 @@ def plot(d, nrows=10, ncols=10):
     fig.tight_layout()
     plt.show()
 
-d = pd.read_csv('trained.csv')
-print(d.loc[:, ['y', 'yhat']])
+d = pd.read_csv('test.csv')
+d['month_number'] = d['dcount']
+d['ytrue'] = d['microbusiness_density']
+d['yhat'] = d['ypred']
+print(list(d.columns))
+month_first = 35
+month_last = 40
+test_idxs = (month_first <= d.month_number) & (d.month_number <= month_last)
+smape = metric.get_smape(d.loc[test_idxs, 'ytrue'], d.loc[test_idxs, 'yhat'])
+print(smape)
+print(d.loc[:, ['microbusiness_density', 'ypred', 'ypred_last']].head(100))
 plot(d)

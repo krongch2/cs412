@@ -86,7 +86,7 @@ Even though time-series forecasting is a challenging problem and requires proced
 Despite being one of the most common techniques to understand linear relationships between dependent variables and independent variables, the formalism for simple linear regression is included for completion. 
 The model is given by 
 \begin{align}
-y_i = \beta_0 + \beta_1 x_i1 + \beta_2 x_i2 + \cdots + \beta_p x_ip + \epsilon_i, 
+y_i = \beta_0 + \beta_1 x_{i1} + \beta_2 x_{i2} + \cdots + \beta_p x_{ip} + \epsilon_i, 
 \end{align}
 where $y$ represents the dependent variable, and $x_p$'s represent independent variables. 
 The index i denotes the sample, and p labels the feature variables. The goal of linear regression is to find a set of $\beta$'s that can minimize the cost function given by 
@@ -172,7 +172,7 @@ ARIMA: SMAPE = 4.609
 The ARIMA implementation is similar to linear regression in the sense that each county has its own model. 
 However, additional complexity is present due to the optimization process of the $(p, d, q)$ parameters as discussed in Eq.~(\ref{eq:arima}) from the Method section.
 The result for ARIMA is plotted in Fig.~\ref{fig:arima}.
-While this type of models results in an improvement over linear regression with SMAPE of 4.609 compared to 8.355 from before, the predicted value simply repeat the value from the previous month for each county.
+While this type of models results in an improvement over linear regression with SMAPE of 4.609 compared to 8.355 from before, the predicted value simply repeats the value from the previous month for each county.
 This behavior means that the model does not have necessary features that would describe the data trend.
 In this case, the main feature that this model learns from is the value of the previous month. 
 Therefore, more features need to be included, such as geographic location or census data, which are discussed in the Timeline section.
