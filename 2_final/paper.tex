@@ -39,7 +39,7 @@
 \newcommand{\mick}[1]{\textbf{\textcolor[rgb]{0,0.6,0.3}{#1}}}
 
 \begin{document}
-\title{CS 412: Mid-point Report for Microbusiness Density Forecasting}
+\title{CS 412: Final Report for Microbusiness Density Forecasting}
 \author{Kittithat Krongchon (krongch2)}
 \affiliation{Department of Physics, University of Illinois at Urbana-Champaign}
 \author{Ting Cheng (tingc4)}
@@ -94,7 +94,7 @@ The index i denotes the sample, and p labels the feature variables. The goal of 
 \frac{1}{n} \sum_i (y_{i} - \hat{y}_{i})^2.
 \end{align}
 
-This technique, however, is based on a few assumptions that affect the accuracy of the linear model. 
+This technique, however, is based on a few assumptions that affect the accuracy of the linear model~\cite{hayashi2011econometrics}. 
 First, linearity is assumed because the model equation only depends on the first polynomial order of independent variables. 
 For a higher order relationship, polynomial regression might be required although such a technique could result in overfitting. 
 Another assumption is that the errors, $\epsilon_i$, are assumed to be independent and normal. 
@@ -115,7 +115,7 @@ This model can be generalized to include the multiplicity of the roots as given 
 \end{align}
 where $L$ is the lag operator, which moves the data by one unit of time, and $d$ is the multiplicity. 
 We solve this model by looping through different combinations of $(p, d, q)$ to find the model that yields the lowest Akaike information criterion (AIC) value. 
-In our analysis, the model called seasonal-ARIMAX (SARIMAX) is used, which is an extension to the ARIMA model to capture seasonal data with exogenous variables.
+In our analysis, the model called seasonal-ARIMAX (SARIMAX) is used, which is an extension to the ARIMA model to capture seasonal data.
 
 \subsection{Tree-based models}
 \begin{figure}
@@ -162,7 +162,7 @@ While in this formula, SMAPE is undefined when both $y_i$ and $\hat{y}_i$ are ze
 % Since the time-series prediction involved in this competition has been well explored in literature, and the existing tools are robust, this specific challenge has a straightforward workflow. 
 % The challenge for us, therefore, comes down to turning the provided information into an object that is suitable for each specific tool as discussed in the previous section.
 
-\section{Result}
+\section{Result and Discussion}
 
 \subsection{Linear regression and ARIMA baseline models}
 \begin{figure*}
@@ -196,7 +196,7 @@ Therefore, more features need to be included, such as geographic location or cen
 Now that we have our baseline results from linear regression and ARIMA, we are ready to move on to a more feature-dependent approach, such as gradient boosting as described in the Method section.
 The hope of this approach is to generate a model that can capture the simultaneous relationship between multiple features and the microbusiness density that our baseline models have failed to do so. 
 One thing to note is that this approach does not have the knowledge of time in our time-series forecasting problem. 
-Therefore, many additional columns need to be created to teach the model the correlation between the past, present, and future.  
+Therefore, many additional columns need to be created to teach the model the correlation between the past, present, and future, which results in a robust performance on time-series forecasting despite being a tree-based model~\cite{wojcik2018prognozowanie}.  
 
 Another concern with this type of models is that it can only predict the value at time $t + 1$, where $t$ represents the month number in our case unlike linear regression or ARIMA models that can predict the value of any time given the model. 
 Our solution to this problem is to use the data that has the month number between $0$ and $t$ as a training set to predict the value at time $t + 1$.
@@ -245,10 +245,30 @@ To work around this problem, we create a new column, which will be our target (n
 We also subtract the final value by 1 to avoid encountering zero division in SMAPE. 
 Thus, the new target is given by
 \begin{align}
-\textrm{target}_t &= \frac{y_{t-1}}{y_t} - 1,   
+\textrm{ratio}_t &= \frac{y_{t-1}}{y_t} - 1,   
 \end{align}
 where $t$ represents the month number and $y$ is the microbusiness density. 
 The hope is that since this new target is a relative measurement, the optimization performance will be better reflected in the SMAPE rather than MAPE.
+Thus, we will perform gradient boosting to predict the new ratio variable instead of directly predicting the microbusiness density, and we will revert the equation to retrieve microbusiness density once the training and fitting procedure is completed.
+The technique results in a large improvement in the model performance with $\textrm{SMAPE} = 2.355$ for only the lag and rolling columns.
+Including the census columns brings this number down to $\textrm{SMAPE} = 2.242$.
+
+Finally, we implement the features related to geographic information. 
+First, the latitude and longitude of each county is obtained from a public database~\cite{uscoordinates}. 
+Then, we create features that convert the latitude and longitude into a flat coordinate as follows.
+\begin{align}
+x &= \cos(\textrm{latitude}) \cos(\textrm{longitude}). \\
+y &= \cos(\textrm{latitude}) \sin(\textrm{longitude}). \\
+z &= \sin(\textrm{latitude})
+\end{align}
+Training the model with these additional geographic information improves the performance even further by a small margin with $\textrm{SMAPE} = 2.156$.
+We report the plot of this model in Fig.~\ref{fig:gb}. 
+The SMAPE values for several multiple training schemes that we have explored are also reported in Table~\ref{tab:smape}.
+
+\begin{figure*}
+\includegraphics[width=7in]{figs/gb.pdf}
+\caption{\label{fig:gb} GB(target=ratio, lag, rolling, census, geodata): SMAPE = 2.156}
+\end{figure*}
 
 \begin{table}
     \caption{
@@ -257,29 +277,44 @@ The hope is that since this new target is a relative measurement, the optimizati
     \label{tab:smape}
     \begin{ruledtabular}
     \begin{tabular}{lr}
-    Method or Features & SMAPE \\
+    Method and Features & SMAPE \\
     \hline
     Linear regression & 8.355 \\
     ARIMA & 4.609 \\
-    GB(lag, rolling) & 4.380 \\
-    GB(lag, rolling, census) & 4.180 \\
+    GB(target=y, lag, rolling) & 4.380 \\
+    GB(target=y, lag, rolling, census) & 4.180 \\
+    GB(target=ratio, lag, rolling) & 2.355 \\
+    GB(target=ratio, lag, rolling, census) & 2.242 \\
+    GB(target=ratio, lag, rolling, census, geodata) & 2.156
 \end{tabular}
 \end{ruledtabular}
 \end{table}
 
-
+\section{Conclusion and Future Directions}
+In this final report of microbusiness density forecasting, we have covered several forecasting methods, which include linear regression and ARMIA as our baseline methods.
+The gradient boosting is then used as our main model while experimenting with different features. 
+We find that gradient boosting with lag and rolling features is good enough to attain the performance level of ARIMA, which is to be expected because these features encode the time-series data into the model.
+Adding the census columns only improves the performance a small margin. 
+However, changing the target from directly predicting the microbusiness density to the time lag ratio improves the performance by almost twofold due to the ability to capture the relative nature of SMAPE.
+Lastly, we have added the geographic data as our features as proposed in the early stage of this project, but the improvement is not high. 
+ 
+There are several improvements that could be made on the implementations of our model.
+First, the ARIMA model with exogenous variables was not implemented, which means that the performance of ARIMA that we have reported does not very well represent this class of technique.  
+Second, hyperparameter tuning in this report was done on a relatively small grid to save computational time. Improvements could be made by expanding the parameter grid. 
+Lastly, outlier analysis could be performed to eliminate uncertainties in the model prediction. For example, the anomalies near month 18 are common among several counties, which might have affected the robustness of our model. 
+Overall, we are quite satisfied with the result and appreciate the insights that we have gained from this project, and we hope to expand our analysis according to the suggested directions in the future. 
 
 % A timeline that specifies your plan to finish the course project.
-\section{Timeline}
+\section{Timeline and Contributions}
 Our analysis involves two milestones. 
 First, the training of time-series data without exogenous variables using linear regression and ARIMA models has been completed.
 We arrived at this stage by March 15, 2023 according to the proposed timeline.
-Since this milestone has been completed, we are moving on to the next stage, which will heavily involve feature engineering.
 
-We expect to complete the training models using XGBoost by April 15, 2023. 
+We completed the training models using \lstinline{CatBoost} by April 15, 2023. 
+Finally, the feature engineering was completed on May 1, 2023.
 The tasks are distributed as follows. 
-K.K. will implement nested cross validation for the time-series data to prevent overfitting and will engineer features related to census data.
-T.C. will implement data visualization and engineers features related to geographic location.
+K.K. implemented nested cross validation for the time-series data to prevent overfitting and engineered features related to census data.
+T.C. implemented data visualization and engineered features related to geographic location.
 
 \bibliography{paper}{}
 \end{document}

@@ -1,0 +1,4 @@
+https://www.kaggle.com/code/osamurai/pydeck-visualization-is-all-you-need
+https://www.kaggle.com/code/asimadnan/darts-catboost-beginner-friendly-1-577-pl
+https://www.kaggle.com/code/mickkrongchon/catboostregressor/edit
+https://www.kaggle.com/datasets/demche/us-county-data-2018-2021
